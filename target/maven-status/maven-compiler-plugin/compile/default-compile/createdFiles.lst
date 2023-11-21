@@ -1,0 +1,9 @@
+ma/fso/masterscolarite/m2i_tp5_bouarour_ayoub_crudapp/models/StudentModel.class
+ma/fso/auth/m2i_tp3_ex2_bouarour_ayoub/utility/Hashing.class
+ma/fso/masterscolarite/m2i_tp5_bouarour_ayoub_crudapp/models/UserModel.class
+ma/fso/masterscolarite/m2i_tp5_bouarour_ayoub_crudapp/models/NotesModel.class
+ma/fso/masterscolarite/m2i_tp5_bouarour_ayoub_crudapp/controllers/LoginController.class
+ma/fso/masterscolarite/m2i_tp5_bouarour_ayoub_crudapp/controllers/AdminController.class
+ma/fso/masterscolarite/m2i_tp5_bouarour_ayoub_crudapp/services/StudentService.class
+ma/fso/masterscolarite/m2i_tp5_bouarour_ayoub_crudapp/services/AuthService.class
+ma/fso/masterscolarite/m2i_tp5_bouarour_ayoub_crudapp/utilities/DatabaseConnect.class

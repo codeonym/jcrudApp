@@ -1,0 +1,16 @@
+{
+  "name": "m2i_tp5_bouarour_ayoub_crudapp",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "tailwindcss build src/main/webapp/resources/css/style.css -o src/main/webapp/resources/css/output.css",
+    "watch": "tailwindcss build src/main/webapp/resources/css/style.css -o src/main/webapp/resources/css/output.css --watch"
+  },
+  "keywords": [],
+  "author": "codeonym",
+  "license": "ISC",
+  "devDependencies": {
+    "tailwindcss": "^3.3.5"
+  }
+}
