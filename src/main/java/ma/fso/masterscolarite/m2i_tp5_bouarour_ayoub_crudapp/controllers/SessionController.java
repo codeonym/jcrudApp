@@ -1,22 +1,28 @@
 package ma.fso.masterscolarite.m2i_tp5_bouarour_ayoub_crudapp.controllers;
 
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import ma.fso.masterscolarite.m2i_tp5_bouarour_ayoub_crudapp.Factory.DaoFactory;
+import ma.fso.masterscolarite.m2i_tp5_bouarour_ayoub_crudapp.dao.ModuleDao;
+import ma.fso.masterscolarite.m2i_tp5_bouarour_ayoub_crudapp.dao.StudentBasicDao;
+import ma.fso.masterscolarite.m2i_tp5_bouarour_ayoub_crudapp.dao.StudentExtraDao;
+import ma.fso.masterscolarite.m2i_tp5_bouarour_ayoub_crudapp.exceptions.DaoGeneratedException;
+import ma.fso.masterscolarite.m2i_tp5_bouarour_ayoub_crudapp.exceptions.DatabaseException;
 import ma.fso.masterscolarite.m2i_tp5_bouarour_ayoub_crudapp.models.ModuleModel;
-import ma.fso.masterscolarite.m2i_tp5_bouarour_ayoub_crudapp.models.StudentModel;
-import ma.fso.masterscolarite.m2i_tp5_bouarour_ayoub_crudapp.models.StudentsMoreModel;
-import ma.fso.masterscolarite.m2i_tp5_bouarour_ayoub_crudapp.models.UserModel;
-import ma.fso.masterscolarite.m2i_tp5_bouarour_ayoub_crudapp.services.ModulesService;
-import ma.fso.masterscolarite.m2i_tp5_bouarour_ayoub_crudapp.services.StudentMoreService;
-import ma.fso.masterscolarite.m2i_tp5_bouarour_ayoub_crudapp.services.StudentService;
+import ma.fso.masterscolarite.m2i_tp5_bouarour_ayoub_crudapp.models.StudentBasicModel;
+import ma.fso.masterscolarite.m2i_tp5_bouarour_ayoub_crudapp.models.StudentExtraModel;
 
-import java.sql.SQLException;
+import java.io.IOException;
 import java.util.List;
 
 public class SessionController {
 
-    public static void updateSession(HttpServletRequest request, HttpServletResponse response) {
+    // ERROR PAGE
+    private static String ERRORS_PAGE = "/WEB-INF/views/errors.jsp";
+    public static void updateSession(HttpServletRequest request, HttpServletResponse response, DaoFactory daoFactory) {
 
         // UPDATE SESSION AFTER EACH MODIFICATION
 
@@ -26,23 +32,42 @@ public class SessionController {
 
             // SESSION IS SET AND OPEN
             // FETCHING DATA
-            List<StudentModel> students = null;
+            List<StudentBasicModel> students = null;
             List<ModuleModel> modules = null;
-            List<StudentsMoreModel> studentsMore = null;
+            List<StudentExtraModel> studentExtra = null;
 
-            StudentService studentService = new StudentService();
-            ModulesService modulesService = new ModulesService();
-            StudentMoreService studentMoreService = new StudentMoreService();
+             try {
+
+                 // INSTANCING DAO FACTORY
+                 daoFactory = DaoFactory.getInstance();
+             }catch(DatabaseException e) {
+
+                 // FORWARDING TO ERROR PAGE
+                 handlingForward(request, response, ERRORS_PAGE);
+                 return;
+
+             }
+            StudentBasicDao studentBasicService  = daoFactory.getStudentBasicDao();
+            StudentExtraDao studentExtraService = daoFactory.getStudentExtraDao() ;
+            ModuleDao moduleService = daoFactory.getModuleDao();
 
             try {
-                students = studentService.fetchAllStudents();
-                modules = modulesService.fetchAllModules();
-                studentsMore = studentMoreService.studentsMore(students, modules);
+                students = studentBasicService.fetchAll();
+                modules = moduleService.fetchAll();
 
-            } catch (SQLException e) {
-                // SOMETHING WENT WRONG ...
-                // DEBUGGING
-                throw new RuntimeException(e);
+            } catch (DaoGeneratedException e) {
+
+                // FORWARDING TO ERROR PAGE
+                handlingForward(request, response, ERRORS_PAGE);
+                return;
+            }
+
+            try {
+                studentExtra = studentExtraService.getMore(students, modules);
+            } catch (DaoGeneratedException e) {
+
+                // PRINT THE EXCEPTION MESSAGE
+                System.out.println(e.getMessage());
             }
 
             if(students != null){
@@ -56,14 +81,25 @@ public class SessionController {
                     // ADDING MODULES TO SESSION
                     session.setAttribute("modules", modules);
                 }
-                if(studentsMore != null){
+                if(studentExtra != null){
 
                     // ADDING STUDENT MORE (EXTRA DATA)  TO SESSION
-                    session.setAttribute("studentsMore", studentsMore);
+                    session.setAttribute("studentsMore", studentExtra);
                 }
             }
         }
 
     }
+    private static void handlingForward(HttpServletRequest request, HttpServletResponse response, String target){
 
+        // DISPATCHING TO SPECIFIC TARGET
+        RequestDispatcher rd = request.getRequestDispatcher(target);
+        try {
+
+            // FORWARDING ..
+            rd.forward(request, response);
+        } catch (ServletException | IOException e) {
+            e.printStackTrace();
+        }
+    }
 }

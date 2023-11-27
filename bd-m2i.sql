@@ -162,6 +162,8 @@ CREATE TABLE `notes` (
   `module_id` int(6) NOT NULL
 ) ;
 
+CREATE UNIQUE INDEX unique_etudiant_module ON `notes` (`etudiant_id`, `module_id`);
+
 --
 -- Dumping data for table `notes`
 --

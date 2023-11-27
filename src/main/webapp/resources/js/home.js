@@ -31,8 +31,11 @@ function closeModal(dialogId) {
   }
 onload = function () {
 
-  // FIRST CALL
-  showSection("showStudents");
+    // DESPAIR AFTER 3S
+    setTimeout(function() {
+        document.getElementById('statusAlert').style.display = 'none';
+    }, 3000);
 
-
+    // PREVENT RESUBMITTING THE FORM
+    window.history.replaceState(null, "", window.location.href);
     }

@@ -12,10 +12,10 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Authentication</title>
+    <title>JcrudApp</title>
     <link rel="stylesheet" href="resources/css/output.css" />
 </head>
-<body class="bg-slate-100 py-4 px-4 flex flex-col text-slate-600 h-screen">
+<body class="bg-slate-100 py-4 px-4 flex flex-col text-slate-600 min-h-screen">
 <header class="bg-white min-w-full flex mx-auto shadow-md shadow-slate-200">
     <div
             class="mx-auto container p-4 text-xl flex w-full items-center justify-between"

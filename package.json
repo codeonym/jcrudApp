@@ -4,13 +4,14 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "tailwindcss build src/main/webapp/resources/css/style.css -o src/main/webapp/resources/css/output.css",
-    "watch": "tailwindcss build src/main/webapp/resources/css/style.css -o src/main/webapp/resources/css/output.css --watch"
+    "build:css": "tailwindcss src/main/webapp/resources/css/style.css -o src/main/webapp/resources/css/output.css",
+    "watch:css": "tailwindcss src/main/webapp/resources/css/style.css -o src/main/webapp/resources/css/output.css --watch"
   },
   "keywords": [],
   "author": "codeonym",
   "license": "ISC",
   "devDependencies": {
-    "tailwindcss": "^3.3.5"
+    "tailwindcss": "^3.3.5",
+    "tailwindcss-cli": "^0.1.2"
   }
 }

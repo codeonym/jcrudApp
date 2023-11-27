@@ -3,51 +3,53 @@
         <h2 class="text-3xl font-semibold mb-4">Students Management</h2>
 
         <!-- Display Student Table -->
-        <table class="min-w-full border border-gray-300">
-            <thead>
-            <tr>
-                <th class="border border-gray-200 px-8 py-2">Id</th>
-                <th class="border border-gray-200 px-8 py-2">Nom</th>
-                <th class="border border-gray-200 px-8 py-2">Prenom</th>
-                <th class="border border-gray-200 px-8 py-2">CNE</th>
-                <th class="border border-gray-200 px-8 py-2">Date de naissance</th>
-                <th class="border border-gray-200 px-8 py-2">Adresse</th>
-                <th class="border border-gray-200 px-8 py-2">Actions</th>
-            </tr>
-            </thead>
-            <tbody>
-            <!-- foreach student LOOP -->
-            <c:forEach var="student" items="${sessionScope.students}">
+        <div class="container overflow-x-auto max-w-100">
+            <table class="min-w-full border border-slate-200">
+                <thead>
                 <tr>
-                    <td class="border border-gray-300 px-8 py-2"><c:out value="${student.getId()}" /></td>
-                    <td class="border border-gray-300 px-8 py-2"><c:out value="${student.getNom()}" /></td>
-                    <td class="border border-gray-300 px-8 py-2"><c:out value="${student.getPrenom()}" /></td>
-                    <td class="border border-gray-300 px-8 py-2"><c:out value="${student.getCne()}" /></td>
-                    <td class="border border-gray-300 px-8 py-2"><c:out value="${student.getDateNaissance()}" /></td>
-                    <td class="border border-gray-300 px-8 py-2">
-                        <c:out value="${student.getAdresse()}" />
-                    </td>
-                    <td class="border h-full border-gray-300 px-4 py-2 flex flex-col lg:flex-row text-center lg:space-x-2 items-center justify-center">
-                        <div class="text-sky-400 border-2 border-sky-400 px-6 py-1">
-                            <button
-                                    onclick="showModal(<c:out value="'editStudentModal_${student.getCne()}'" />)">Edit</button>
-                        </div>
-                        <form action="studentAction" method="post"
-                              class="text-red-400 border-2 border-red-400 px-6 py-1">
-                            <input type="hidden" name="action" value="delete_student" />
-                            <input type="hidden" name="delete_cne" value="<c:out value="${student.getCne()}" />">
-                            <button type="submit" name="delete"
-                                    onclick="submitForm()">Delete</button>
-                        </form>
-                        <div class="text-teal-400 border-2 border-teal-400 px-6 py-1">
-                            <button
-                                    onclick="showModal(<c:out value="'moduleDetails_${student.getCne()}'" />)">More</button>
-                        </div>
-                    </td>
+                    <th class="border border-slate-200 px-4 py-2">Id</th>
+                    <th class="border border-slate-200 px-4 py-2">Nom</th>
+                    <th class="border border-slate-200 px-4 py-2">Prenom</th>
+                    <th class="border border-slate-200 px-4 py-2">CNE</th>
+                    <th class="border border-slate-200 px-4 py-2">Date de naissance</th>
+                    <th class="border border-slate-200 px-4 py-2">Adresse</th>
+                    <th class="border border-slate-200 px-4 py-2">Actions</th>
                 </tr>
-            </c:forEach>
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                <!-- foreach student LOOP -->
+                <c:forEach var="student" items="${sessionScope.students}">
+                    <tr class="border border-slate-200">
+                        <td class="border border-slate-200 px-4 py-2"><c:out value="${student.getId()}" /></td>
+                        <td class="border border-slate-200 px-4 py-2"><c:out value="${student.getNom()}" /></td>
+                        <td class="border border-slate-200 px-4 py-2"><c:out value="${student.getPrenom()}" /></td>
+                        <td class="border border-slate-200 px-4 py-2"><c:out value="${student.getCne()}" /></td>
+                        <td class="border border-slate-200 px-4 py-2"><c:out value="${student.getDateNaissance()}" /></td>
+                        <td class="border border-slate-200 px-4 py-2">
+                            <c:out value="${student.getAdresse()}" />
+                        </td>
+                        <td class="px-4 py-2 flex flex-col lg:flex-row text-center lg:space-x-2 items-center justify-center">
+                            <div class="text-sky-400 border-2 border-sky-400 px-6 py-1 w-24">
+                                <button
+                                        onclick="showModal(<c:out value="'editStudentModal_${student.getCne()}'" />)">Edit</button>
+                            </div>
+                            <form action="studentAction" method="post"
+                                  class="text-red-400 border-2 border-red-400 px-6 py-1 w-24">
+                                <input type="hidden" name="action" value="delete_student" />
+                                <input type="hidden" name="delete_cne" value="<c:out value="${student.getCne()}" />">
+                                <button type="submit" name="delete"
+                                        onclick="submitForm()">Delete</button>
+                            </form>
+                            <div class="text-teal-400 border-2 border-teal-400 px-6 py-1 w-24">
+                                <button
+                                        onclick="showModal(<c:out value="'moduleDetails_${student.getCne()}'" />)">More</button>
+                            </div>
+                        </td>
+                    </tr>
+                </c:forEach>
+                </tbody>
+            </table>
+        </div>
     </div>
     <c:forEach var="student" items="${sessionScope.students}">
         <div id="editStudentModal_<c:out value="${student.getCne()}" />"

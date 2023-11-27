@@ -24,6 +24,7 @@
             >
                 <h1 class="text-sky-400 transition-colors">Authenticate !</h1>
             </div>
+            <p class="text-red-400 text-center"><c:out value="${loginFailed}" /></p>
             <form
                     action="login"
                     method="post"

@@ -1,4 +1,12 @@
 <!-- Main Content -->
+<c:if test="${not empty alert}">
+    <c:if test="${alert.getStatus() eq 1}">
+        <%@ include file="../includes/alert-success.jsp" %>
+    </c:if>
+    <c:if test="${alert.getStatus() eq 0}">
+        <%@ include file="../includes/alert-fail.jsp" %>
+    </c:if>
+</c:if>
 <main class="bg-white mt-8">
     <div class="container mx-auto mt-8 flex flex-col md:flex-row">
         <aside class="text-slate-400 p-4 flex-shrink-0  md:w-80 lg:w-96 md:border-r-2 md:border-slate-100">
@@ -34,7 +42,7 @@
         </aside>
 
         <!-- Main Content -->
-        <div class="flex-1 p-8 min-h-screen text-slate-500">
+        <div class="flex-1 p-8 min-h-screen text-slate-500 overflow-x-scroll">
 
             <%-- NOTICE: THOSE INCLUDES ARE INCLUDE AT COMPILE TIME --%>
             <%@ include file="../includes/viewStudents.jsp" %>
@@ -47,5 +55,17 @@
 </main>
 <!-- JavaScript for Sidebar Functionality -->
 <script src="resources/js/home.js"></script>
+<script>
+    <c:choose>
+    <c:when test="${searchForm eq true}">
+    <c:set var="section" value="searchStudent" />
+    </c:when>
+    <c:otherwise>
+    <c:set var="section" value="viewStudents" />
+    </c:otherwise>
+    </c:choose>
+
+    showSection('<c:out value='${section}' />');
+</script>
 </body>
 </html>

@@ -1,49 +1,43 @@
 package ma.fso.masterscolarite.m2i_tp5_bouarour_ayoub_crudapp.controllers;
 
 import java.io.*;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.*;
 import ma.fso.auth.m2i_tp3_ex2_bouarour_ayoub.utility.Hashing;
+import ma.fso.masterscolarite.m2i_tp5_bouarour_ayoub_crudapp.Factory.DaoFactory;
+import ma.fso.masterscolarite.m2i_tp5_bouarour_ayoub_crudapp.dao.UserDao;
+import ma.fso.masterscolarite.m2i_tp5_bouarour_ayoub_crudapp.exceptions.DaoGeneratedException;
+import ma.fso.masterscolarite.m2i_tp5_bouarour_ayoub_crudapp.exceptions.DatabaseException;
+import ma.fso.masterscolarite.m2i_tp5_bouarour_ayoub_crudapp.filters.UserInputFilter;
 import ma.fso.masterscolarite.m2i_tp5_bouarour_ayoub_crudapp.models.*;
-import ma.fso.masterscolarite.m2i_tp5_bouarour_ayoub_crudapp.services.AuthService;
-import ma.fso.masterscolarite.m2i_tp5_bouarour_ayoub_crudapp.services.ModulesService;
-import ma.fso.masterscolarite.m2i_tp5_bouarour_ayoub_crudapp.services.StudentMoreService;
-import ma.fso.masterscolarite.m2i_tp5_bouarour_ayoub_crudapp.services.StudentService;
-import ma.fso.masterscolarite.m2i_tp5_bouarour_ayoub_crudapp.utilities.DatabaseConnect;
-import org.hibernate.Session;
-import org.hibernate.boot.model.relational.Database;
 
 public class LoginController extends HttpServlet {
 
-    // INITIALIZING THE VIEWS VARIABLES:
-    private final String loginPage = "/WEB-INF/views/login.jsp";
-    private final String homePage = "/WEB-INF/views/home.jsp";
-    private final String errorPage = "/WEB-INF/views/errors.jsp";
+    // VIEWS VARIABLES:
+    private final String LOGIN_PAGE = "/WEB-INF/views/login.jsp";
+    private final String HOME_PAGE = "/WEB-INF/views/home.jsp";
+    private final String ERRORS_PAGE = "/WEB-INF/views/errors.jsp";
 
-    // INITIALIZING THE GLOBAL OBJS
-    AuthService authService = new AuthService();
+    // GLOBAL DECLARATIONS
+    UserDao userAuthService;
+    DaoFactory daoFactory ;
 
     public void init() {
-        // TESTING DATABASE CONNECTIVITY
-        try(Connection conn = DatabaseConnect.getConnection()){
-            // THE CONNECTION WILL BE CLOSED AUTOMATICALLY AFTER THE END OF TRY-CATCH
 
-            // CHECK THE CONNECTIVITY
-            if(conn != null){
-                // CONNECTED SUCCESSFULLY
-                System.out.println("\n :: ~ NOTICE: CONNECTION ESTABLISHED TO THE DATABASE SERVER.");
-            }
-        }catch(Exception e){
-            // DEBUGGING
-            System.out.println("\n :: ^ ERROR: CONNECTION REFUSED TO THE DATABASE SERVER !");
-            e.printStackTrace();
+        // INITIALIZING DAO FACTORY
+        try {
+            daoFactory = DaoFactory.getInstance();
+            userAuthService = daoFactory.getUserDao();
+
+        } catch (DatabaseException e) {
+
+            // PRINTING THE EXCEPTION MESSAGE
+            System.err.println(e.getMessage());
         }
+
+
     }
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -61,16 +55,17 @@ public class LoginController extends HttpServlet {
             // USER IS ALREADY AUTHENTICATED
 
             // SESSION UPDATE
-            SessionController.updateSession(request, response);
+            SessionController.updateSession(request, response, daoFactory );
 
-            handlingForward(request, response, homePage);
+            handlingForward(request, response, HOME_PAGE);
 
         }else {
             // USER NOT AUTHENTICATED
-            // FORWARD TO LOGIN PAGE
-            handlingForward(request, response, loginPage);
+            // FORWARDING TO LOGIN PAGE
+            handlingForward(request, response, LOGIN_PAGE);
         }
     }
+
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("text/html");
 
@@ -91,18 +86,18 @@ public class LoginController extends HttpServlet {
         HttpSession session = request.getSession();
 
         // DECLARATIONS
-        String username,password;
+        String username = "",password = "";
 
-        // GET USERNAME, PASSWORD
-        username = request.getParameter("username");
-        password = request.getParameter("password");
+        // GET USERNAME, PASSWORD AND APPLY FILTERS
+        username = UserInputFilter.testInput(request.getParameter("username"));
+        password = UserInputFilter.testInput(request.getParameter("password"));
 
         // VALIDATING INPUT FIELDS
-        if (username == null || password == null || username.isEmpty() || password.isEmpty()){
+        if ( username.isEmpty() || password.isEmpty()){
 
             // INVALID INPUT DETECTED => DO NOTHING
             // REDIRECTION TO LOGIN PAGE
-            handlingForward(request, response, loginPage);
+            handlingForward(request, response, LOGIN_PAGE);
         }
         else {
 
@@ -122,11 +117,10 @@ public class LoginController extends HttpServlet {
                 String hashedPassword = hash.hash_sha256(password);
 
                 // TESTING AUTHENTICATION
-                user = authService.authentication(username, hashedPassword);
-            } catch (SQLException e) {
-                // SOMETHING WENT WRONG
-                //DEBUGGING
-                throw new RuntimeException(e);
+                user = userAuthService.authentication(username, hashedPassword);
+            } catch (DaoGeneratedException e) {
+
+                System.err.println(e.getMessage());
             }
             if(user != null){
 
@@ -138,15 +132,19 @@ public class LoginController extends HttpServlet {
                 session.setMaxInactiveInterval(60*5);
 
                 // SESSION UPDATE
-                SessionController.updateSession(request, response);
+                SessionController.updateSession(request, response, daoFactory);
 
                 // REDIRECTING  TO HOME PAGE
-                handlingForward(request, response, homePage);
+                handlingForward(request, response, HOME_PAGE);
             }else {
 
                 // NOT AUTHENTICATED
+
+                // CHANGING THE COLOR TO INDICATE FAILURE
+                request.setAttribute("loginFailed","Authentication Failed. Please Check Your Credentials");
+
                 // REDIRECT TO LOGIN PAGE
-                handlingForward(request, response, loginPage);
+                handlingForward(request, response, LOGIN_PAGE);
             }
         }
 
@@ -165,8 +163,9 @@ public class LoginController extends HttpServlet {
         }
 
         // REDIRECTING TO LOGIN PAGE
-        handlingForward(request, response, loginPage);
+        handlingForward(request, response, LOGIN_PAGE);
     }
+
     private void handlingForward(HttpServletRequest request, HttpServletResponse response, String target){
 
         // DISPATCHING TO SPECIFIC TARGET
